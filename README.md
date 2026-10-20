@@ -3,7 +3,6 @@
 > 清理 **已经落地到主线** 的 git 分支：默认只报告，删前自动备份。
 > A DeepSeek Harness plugin that finds branches whose work already landed in the mainline — merged, squash-merged, patch-equivalent (rebase/cherry-pick), upstream-gone, or PR-merged — then deletes them safely.
 
-[![npm](https://img.shields.io/npm/v/dsh-branch-cleaner)](https://www.npmjs.com/package/dsh-branch-cleaner)
 [![license](https://img.shields.io/github/license/ramwin/dsh-branch-cleaner)](./LICENSE)
 
 ## 为什么需要它
@@ -22,11 +21,11 @@
 ## 安装
 
 ```sh
-# npm
-dsh plugin --profile web add dsh-branch-cleaner
-
-# 或者从 GitHub 装（含 beta 分支）
+# 从 GitHub 装（推荐，跟随 main）
 dsh plugin --profile web add github:ramwin/dsh-branch-cleaner
+
+# npm（等 package 发布后）
+dsh plugin --profile web add dsh-branch-cleaner
 
 # 本地开发
 dsh plugin --profile web add /path/to/dsh-branch-cleaner
@@ -91,8 +90,11 @@ scripts/sync-from-linux-reference.sh
 ## 开发
 
 ```sh
-node --test test/        # 10 个用例：参数翻译 / JSON 解析 / 真实仓库 report 与 delete
+node --test test/             # 10 个用例：参数翻译 / JSON 解析 / 真实仓库 report 与 delete
+node scripts/mount-check.mjs  # 挂进真 ToolRuntime, 跑一次 report + delete
 ```
+
+`mount-check` 依赖上层目录里已安装的 `@deepseek-ai/*`（也就是本机装了 dsh 才行）。
 
 ## License
 
