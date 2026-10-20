@@ -54,8 +54,8 @@ dsh plugin --profile web add /path/to/dsh-branch-cleaner
 | `patches` | boolean | 识别 rebase / cherry-pick 落地 |
 | `gone` | boolean | 识别上游已删除的分支 |
 | `pr` | boolean | 用 `gh` 识别已合并的 PR |
-| `all` | boolean | = `squash` + `patches` + `gone` + `prune` + `remote` |
-| `remote` | boolean | 连 origin 上的已合并远程分支一起清 |
+| `all` | boolean | = `squash` + `patches` + `gone` + `prune`（**不含** `remote`） |
+| `remote` | boolean | 连 origin 上的已合并远程分支一起清（要单独加，`all` 不含它） |
 | `prune` | boolean | 先 `git fetch --prune` 刷新 `[gone]` |
 | `age` | integer | 只处理 tip 提交早于 N 天的分支 |
 | `keep` | string[] | 额外保护的 glob，如 `wip/*`（默认已保护 main/master/develop/release/* 等） |
