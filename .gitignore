@@ -3,3 +3,8 @@ node_modules/
 *.log
 .DS_Store
 _build/
+
+# 全局 gitignore 里的 Python 规则用 `lib/` 排除了库目录, 但 dsh 插件的入口
+# 就在 lib/index.js, 必须反向放行, 否则 GitHub 上的仓库缺入口文件.
+!lib/
+!lib/**
