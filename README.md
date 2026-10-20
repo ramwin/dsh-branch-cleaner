@@ -59,7 +59,7 @@ dsh plugin --profile web add /path/to/dsh-branch-cleaner
 | `prune` | boolean | 先 `git fetch --prune` 刷新 `[gone]` |
 | `age` | integer | 只处理 tip 提交早于 N 天的分支 |
 | `keep` | string[] | 额外保护的 glob，如 `wip/*`（默认已保护 main/master/develop/release/* 等） |
-| `recurseSubmodules` | boolean | 对每个已初始化子模块各跑一遍 |
+| `recurseSubmodules` | boolean | 对每个已初始化子模块各跑一遍（只做本地清理，不带 `prune`/`remote`） |
 | `timeoutMs` | integer | 协作式超时，默认 180000 |
 
 ### 安全性
@@ -74,6 +74,12 @@ dsh plugin --profile web add /path/to/dsh-branch-cleaner
   git branch feat/x $(git rev-parse refs/backup/branch-cleaner/20260101-120000/feat/x)
   ```
 - **squash 判定不会误杀**：它问的是「把这个分支合回去，主线会不会变」——会变就不删。
+
+### 输出
+
+`branches` / `remoteBranches` 里每行都带 `repo` 字段（`.` 表示顶层仓库，其余是相对路径），
+`deleted` / `failed` 是整棵子模块树的合计。递归时只列可删分支，未合并的会折成一句
+「其余 N 个已略过」。
 
 ## 和脚本的关系
 

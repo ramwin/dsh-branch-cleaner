@@ -11,6 +11,7 @@ import {
   buildCommand,
   createTool,
   parseReport,
+  parseReports,
   shellQuote,
   summarize,
   toValue,
@@ -130,14 +131,41 @@ test('parseReport tolerates noise before the JSON line', () => {
   assert.throws(() => parseReport('nothing here'), /no JSON report/)
 })
 
+test('parseReports reads one report per repository', () => {
+  const stdout = [
+    '{"repo":"/top","base":"main","local":[]}',
+    '=== 子模块 sub ===',
+    '{"repo":"/top/sub","base":"main","local":[]}',
+  ].join('\n')
+  assert.deepEqual(parseReports(stdout).map((report) => report.repo), ['/top', '/top/sub'])
+})
+
 test('toValue normalizes a partial report', () => {
   const value = toValue({ repo: '/r', base: 'main', local: [{ name: 'x', action: 'delete', status: 'merged' }] })
   assert.equal(value.repo, '/r')
   assert.deepEqual(value.deleted, { local: 0, remote: 0 })
   assert.deepEqual(value.failed, { local: 0, remote: 0 })
   assert.deepEqual(value.remoteBranches, [])
-  assert.deepEqual(value.branches[0], { name: 'x', action: 'delete', status: 'merged', reason: '' })
+  assert.deepEqual(value.branches[0], {
+    repo: '.',
+    name: 'x',
+    action: 'delete',
+    status: 'merged',
+    reason: '',
+  })
   assert.equal(value.mode, 'report')
+})
+
+test('toValue folds submodule reports and sums the counters', () => {
+  const value = toValue([
+    { repo: '/top', base: 'main', backup: 'refs/backup/top/', deleted: { local: 1 }, local: [{ name: 'a', action: 'delete', status: 'merged' }] },
+    { repo: '/top/python/x', base: 'master', deleted: { local: 2 }, failed: { local: 1 }, local: [{ name: 'b', action: 'delete', status: 'merged' }] },
+  ], 'delete')
+  assert.equal(value.branches.length, 2)
+  assert.deepEqual(value.branches.map((branch) => branch.repo), ['.', 'python/x'])
+  assert.deepEqual(value.deleted, { local: 3, remote: 0 })
+  assert.deepEqual(value.failed, { local: 1, remote: 0 })
+  assert.equal(value.backup, 'refs/backup/top/')
 })
 
 test('summarize lists counts and branch reasons', () => {
@@ -149,8 +177,8 @@ test('summarize lists counts and branch reasons', () => {
     deleted: { local: 0, remote: 0 },
     failed: { local: 0, remote: 0 },
     branches: [
-      { name: 'feat/merged', action: 'delete', status: 'merged', reason: '已合并到 main' },
-      { name: 'feat/wip', action: 'keep', status: 'skip', reason: '未合并(领先 1 个提交)' },
+      { repo: '.', name: 'feat/merged', action: 'delete', status: 'merged', reason: '已合并到 main' },
+      { repo: '.', name: 'feat/wip', action: 'keep', status: 'skip', reason: '未合并(领先 1 个提交)' },
     ],
     remoteBranches: [],
   })
