@@ -1,0 +1,7 @@
+# dsh-branch-cleaner bundle patch: inserts the host plugin row into the web
+# profile roster. The plugin has no Web UI and no configuration — it only
+# registers the `git_clean_branches` tool, which shells out to the bundled
+# assets/delete_redundant_branch.sh.
+- insert:
+    - id: branch-cleaner
+      name: 'dsh-branch-cleaner'
