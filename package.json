@@ -1,6 +1,6 @@
 {
   "name": "dsh-branch-cleaner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DeepSeek Harness 的冗余分支清理工具：找出已经落地到主线的 git 分支（普通合并 / squash 合并 / rebase 落地 / 上游已删 / PR 已合并）并可一键删除，默认只报告、删除前自动备份到 refs/backup/branch-cleaner/。Branch cleaner plugin for DSH — detect merged, squash-merged, patch-equivalent, upstream-gone and PR-merged branches, then delete them safely.",
   "license": "MIT",
   "type": "module",
